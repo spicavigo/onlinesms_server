@@ -1,0 +1,23 @@
+{% extends "templates/base.html" %}
+{% block title %}{% endblock %}
+{% block body %}
+
+<div class="container">
+    <div class="row">
+        <div class="span5 vidstream well" id="otherstream"></div>
+        <div class="span5 vidstream well" id="mystream-parent">
+            <div  id="mystream"></div>
+        </div>
+    </div>
+    
+</div>
+{% if mine %}
+<em class="text-success">Send the URL below to the member you want to chat with</em>
+<p id="chaturl"></p>
+{% endif %}
+  <hr>
+
+  <footer>
+    
+  </footer>
+{% endblock %}

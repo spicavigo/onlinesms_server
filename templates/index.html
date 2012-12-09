@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Online SMS</title>
+    <link href="/static/bootstrap/css/bootstrap.css" rel="stylesheet">
+	<style>
+	.container {
+		background: #fff;
+	}
+	#alert {
+		display: none;
+	}
+	.row{
+	    margin-left:0px;
+	}
+	.navbar .brand{
+	    font-size:44px;
+	    color:#113;
+	}
+	</style>
+	<script language="javascript" type="text/javascript">
+    function limitText(limitField, limitCount, limitNum) {
+	    if (limitField.value.length > limitNum) {
+		    limitField.value = limitField.value.substring(0, limitNum);
+	    } else {
+		    limitCount.value = limitNum - limitField.value.length;
+	    }
+    }
+    </script>
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+<body>
+    <div class="navbar">
+      <div class="navbar-inner">
+        <a class="brand" href="#"><img src="/static/logo.png"/><span style="font-weight:bold;padding-left:10px">Online SMS</span></a>
+        <ul class="nav">
+
+        </ul>
+      </div>
+    </div>
+    <div class="container well">
+        <form class="form-horizontal" method="post" action="/">
+            <div class="control-group">
+                <label class="control-label" for="phone">Phone Number</label>
+                <div class="controls">
+                  <input type="text" id="phone" name="phone" placeholder="Phone Number">
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="msg">Message</label>
+                <div class="controls">
+                  <textarea style="width:auto;" name="msg" id="msg" rows="5" cols="60" onKeyDown="limitText(this.form.msg,this.form.countdown,160);" onKeyUp="limitText(this.form.msg,this.form.countdown,160);"></textarea>
+                  
+                </div>
+                <font size="1" style="margin-left:180px">(Maximum characters: 160)</font>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="phone"></label>
+                <div class="controls">
+                    <input readonly type="text" id="countdown" name="countdown" size="3" value="160"> characters left.
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="controls">
+                    <button type="submit" class="btn">Send</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

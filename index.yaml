@@ -1,0 +1,6 @@
+indexes:
+- kind: Token
+  ancestor: yes
+  properties:
+  - name: apid
+  - name: email
