@@ -111,15 +111,16 @@ class HistoryHandler(BaseHandler):
     def get(self):
         PAGESIZE = 10
         next = 0
-        bookmark = self.request.get("bookmark")
+        next = int(self.request.get("next", 0))
         user = users.get_current_user()
-        if bookmark:
-            hist = History.query(History.email == user.email()).order(-History.created).fetch(PAGESIZE, offset=int(bookmark)*PAGESIZE +1)
+        if next:
+            hist = History.query(History.email == user.email()).order(-History.created).fetch(PAGESIZE, offset=int(next)*PAGESIZE +1)
         else:
             hist = History.query(History.email == user.email()).order(-History.created).fetch(PAGESIZE+1)
         if len(hist) == PAGESIZE+1:
             next = next + 1
             hist = hist[:PAGESIZE]
+        else:next=0
         template = jinja_environment.get_template('templates/history.html')
         self.response.out.write(template.render({'hist':hist,'next':next }))
                 

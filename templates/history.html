@@ -65,7 +65,7 @@
                 <td>{{h.contact_name}}</td>
                 <td>{{h.phone}}</td>
                 <td>{{h.msg}}</td>
-                <td>{{h.created}}</td>
+                <td class="dt">{{h.created}}</td>
             </tr>
         {% endfor %}
         </tbody>
@@ -76,7 +76,7 @@
         </div>
     {% endif %}
     {% if next %}
-    <a href="/history?next={{next}}">Next</a>
+    <a href="/history/?next={{next}}">Next</a>
     {% endif %}
     </div>
     <script src="/static/js/jquery.js"></script>
