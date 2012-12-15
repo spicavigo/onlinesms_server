@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <title>Online SMS</title>
     <link href="/static/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="/static/css/main.css" rel="stylesheet">
 	<style>
 	.container {
 		background: #fff;
@@ -37,15 +38,16 @@
     <div class="navbar">
       <div class="navbar-inner">
         <a class="brand" href="#"><img src="/static/logo.png"/><span style="font-weight:bold;padding-left:10px">Online SMS</span></a>
-        <ul class="nav">
+        <ul class="nav" style="top:28px">
             <li><a href="/history/">History</a></li>
+            <li class="for_number"><a href="#" onclick="send_to_number(); return false;">Send to Phone #</a></li>
+            <li class="for_contact active"><a href="#" onclick="send_to_contact(); return false;">Send to Contact</a></li>
         </ul>
       </div>
     </div>
-    <div class="container well">
-        <div id="errormsg" class="alert alert-error" style="display:none">
-            
-        </div>
+    
+    <div class="container well send-to-number" style="display:none">
+        <div id="errormsg" class="alert alert-error" style="display:none"></div>
         {% if status is sameas 100 %}
         <div class="alert alert-error">
             Your phone is not yet registered. Install <a target="_blank" href="https://play.google.com/store/apps/details?id=com.fauzism.onlinesms">Online SMS</a> app on your Android Phone from Play Store and register.
@@ -80,8 +82,61 @@
             </div>
         </form>
     </div>
+    <div class="container well send-to-contact" id="contact-list">
+        <div>
+            <div class="input-append" style="text-align:center">
+			    <input type="text" class="span6" name="search" id="search" value="" placeholder="Start typing contact name..." autocomplete="off" /> 
+			    <span class="add-on"><i class="icon-filter"></i></span>
+            </div>
+		</div>
+		<p id="noMatches" style="display:none;">No matches found</p>
+		<div class="clearfix"></div>
+		<ul class="iso-container clearfix">
+		</ul>
+    </div>
+    <div id="sms-modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="sms-modal-label" aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="sms-modal-label">Send SMS to </h3>
+        </div>
+        <form id="sms-form-modal" class="form" method="post" style="margin-bottom:0" action="/">
+            <div class="modal-body">
+                <div class="alert alert-error" style="display:none">
+                    Your phone is not yet registered. Install <a target="_blank" href="https://play.google.com/store/apps/details?id=com.fauzism.onlinesms">Online SMS</a> app on your Android Phone from Play Store and register.
+                </div>
+                <input type="hidden" id="contact_name2" name="contact_name">
+                <input type="hidden" id="phone2" name="phone">
+                <input type="hidden" id="isajax" name="isajax" value="1">
+                <div class="control-group">
+                    <label class="control-label" for="msg">Message</label>
+                    <div class="controls">
+                      <textarea style="width:auto;margin-bottom: 0;" name="msg" id="msg2" rows="5" cols="60" onKeyDown="limitText(this.form.msg2,this.form.countdown,3500);" onKeyUp="limitText(this.form.msg2,this.form.countdown,3500);"></textarea>
+                      
+                    </div>
+                    <font size="1" style="margin-left:180px">(Maximum characters: 3500)</font>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="phone"></label>
+                    <div class="controls">
+                        <input readonly type="text" id="countdown2" name="countdown" size="3" value="3500"> characters left.
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+                <button type="submit" class="btn btn-primary">Send</button>
+            </div>
+        </form>
+    </div>
+    
+    <div id="page-loader" style="display: block;">
+		<h3>Fetching Contacts from Google.</h3>
+		<img src="/static/img/loader.gif" alt="loader">
+	</div>
     <script src="/static/js/jquery.js"></script>
     <script src="/static/bootstrap/js/bootstrap.js" ></script>
+    <script src="/static/js/isotope.js"></script>
+    <script src="/static/js/filter.js"></script>
     <script src="/static/js/main.js"></script>
     <script src="https://apis.google.com/js/client.js?onload=load"></script>
 </body>

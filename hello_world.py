@@ -29,22 +29,29 @@ class MyHandler(webapp2.RequestHandler):
     def get(self):
         user = users.get_current_user()
         if user:
+            q = Token.query(Token.email == user.email())
+            token = q.get()
+            status = 100
+            if token:status = 200
             template = jinja_environment.get_template('templates/index.html')
-            self.response.out.write(template.render({}))
+            self.response.out.write(template.render({'status':status}))
         else:
             template = jinja_environment.get_template('templates/login.html')
             self.response.out.write(template.render({"path": users.create_login_url("/")}))
             
     def post(self):
+        isajax = self.request.get('isajax')
+        phone = self.request.get('phone')
+        msg = self.request.get('msg')
+        contact_name = self.request.get('contact_name')
+
         user = users.get_current_user()
         q = Token.query(Token.email == user.email())
         token = q.get()
         status = 100
         if token:
             status = 200
-            phone = self.request.get('phone')
-            msg = self.request.get('msg')
-            contact_name = self.request.get('contact_name')
+            
             hist = History(email=user.email(), msg=msg, phone=phone, contact_name = contact_name)
             hist.put()
             airship.push({
@@ -52,10 +59,12 @@ class MyHandler(webapp2.RequestHandler):
                      "extra": {"msgid": str(hist.key.id()), "phone": phone, "msg":msg}
                 }
             }, apids=[token.apid])
-            
-        template = jinja_environment.get_template('templates/index.html')
-        self.response.out.write(template.render({'status':status}))
         
+        
+        if False:
+            template = jinja_environment.get_template('templates/index.html')
+            self.response.out.write(template.render({'status':status}))
+        else:self.response.out.write(json.dumps({'status':status}))
         
 class RegisterHandler(BaseHandler):
     def get(self):
