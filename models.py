@@ -15,3 +15,11 @@ from google.appengine.ext import ndb
 class Token(ndb.Model):
     email = ndb.StringProperty()
     apid = ndb.StringProperty()
+
+class History(ndb.Model):
+    email = ndb.StringProperty()
+    msg = ndb.TextProperty()
+    contact_name = ndb.StringProperty()
+    phone = ndb.StringProperty()
+    sent = ndb.BooleanProperty(default=False)
+    created = ndb.DateTimeProperty(auto_now_add=True)

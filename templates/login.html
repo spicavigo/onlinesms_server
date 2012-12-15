@@ -19,6 +19,17 @@
 	    color:#113;
 	}
 	</style>
+	
+	<script src="https://apis.google.com/js/client.js?onload=load"></script>
+	<script language="javascript" type="text/javascript">
+    function limitText(limitField, limitCount, limitNum) {
+	    if (limitField.value.length > limitNum) {
+		    limitField.value = limitField.value.substring(0, limitNum);
+	    } else {
+		    limitCount.value = limitNum - limitField.value.length;
+	    }
+    }
+    </script>
     <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
     <!--[if lt IE 9]>
       <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>

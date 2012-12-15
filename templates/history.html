@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Online SMS</title>
+    <link href="/static/bootstrap/css/bootstrap.css" rel="stylesheet">
+	<style>
+	.container {
+		background: #fff;
+	}
+	#alert {
+		display: none;
+	}
+	.row{
+	    margin-left:0px;
+	}
+	.navbar .brand{
+	    font-size:44px;
+	    color:#113;
+	}
+	</style>
+	
+	<script language="javascript" type="text/javascript">
+    function limitText(limitField, limitCount, limitNum) {
+	    if (limitField.value.length > limitNum) {
+		    limitField.value = limitField.value.substring(0, limitNum);
+	    } else {
+		    limitCount.value = limitNum - limitField.value.length;
+	    }
+    }
+    </script>
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+<body>
+    <div class="navbar">
+      <div class="navbar-inner">
+        <a class="brand" href="/"><img src="/static/logo.png"/><span style="font-weight:bold;padding-left:10px">Online SMS</span></a>
+        <ul class="nav">
+            <li><a href="/history/">History</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="container well">
+    {% if hist %}
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Status</th>
+                <th>Name</th>
+                <th>Phone</th>
+                <th>Message</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for h in hist %}
+            <tr>
+                {% if h.sent %}
+                <td><span class="label label-success">Sent</span></td>
+                {% else %}
+                <td><span class="label">Pending</span></td>
+                {% endif %}
+                <td>{{h.contact_name}}</td>
+                <td>{{h.phone}}</td>
+                <td>{{h.msg}}</td>
+                <td>{{h.created}}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="alert alert-error">
+            You have not sent any SMS yet.
+        </div>
+    {% endif %}
+    {% if next %}
+    <a href="/history?next={{next}}">Next</a>
+    {% endif %}
+    </div>
+    <script src="/static/js/jquery.js"></script>
+    <script src="/static/bootstrap/js/bootstrap.js" ></script>
+    <script src="/static/js/main.js"></script>
+</body>
+</html>

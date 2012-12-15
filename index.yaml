@@ -4,3 +4,17 @@ indexes:
   properties:
   - name: apid
   - name: email
+- kind: History
+  ancestor: yes
+  properties:
+  - name: contact_name
+  - name: phone
+  - name: sent
+  - name: email
+  - name: created
+    direction: desc
+- kind: History
+  properties:
+  - name: email
+  - name: created
+    direction: desc

@@ -19,6 +19,7 @@
 	    color:#113;
 	}
 	</style>
+	
 	<script language="javascript" type="text/javascript">
     function limitText(limitField, limitCount, limitNum) {
 	    if (limitField.value.length > limitNum) {
@@ -37,30 +38,39 @@
       <div class="navbar-inner">
         <a class="brand" href="#"><img src="/static/logo.png"/><span style="font-weight:bold;padding-left:10px">Online SMS</span></a>
         <ul class="nav">
-
+            <li><a href="/history/">History</a></li>
         </ul>
       </div>
     </div>
     <div class="container well">
-        <form class="form-horizontal" method="post" action="/">
+        <div id="errormsg" class="alert alert-error" style="display:none">
+            
+        </div>
+        {% if status is sameas 100 %}
+        <div class="alert alert-error">
+            Your phone is not yet registered. Install <a target="_blank" href="https://play.google.com/store/apps/details?id=com.fauzism.onlinesms">Online SMS</a> app on your Android Phone from Play Store and register.
+        </div>
+        {% endif %}
+        <form id="sms-form" class="form-horizontal" method="post" action="/">
             <div class="control-group">
-                <label class="control-label" for="phone">Phone Number</label>
+                <label class="control-label" for="phone">Contact Name/Number</label>
                 <div class="controls">
-                  <input type="text" id="phone" name="phone" placeholder="Phone Number">
+                  <input type="text" id="phone" name="phone" autocomplete="off" placeholder="Phone Number">
                 </div>
             </div>
+            <input type="hidden" id="contact_name" name="contact_name">
             <div class="control-group">
                 <label class="control-label" for="msg">Message</label>
                 <div class="controls">
-                  <textarea style="width:auto;" name="msg" id="msg" rows="5" cols="60" onKeyDown="limitText(this.form.msg,this.form.countdown,160);" onKeyUp="limitText(this.form.msg,this.form.countdown,160);"></textarea>
+                  <textarea style="width:auto;" name="msg" id="msg" rows="5" cols="60" onKeyDown="limitText(this.form.msg,this.form.countdown,3500);" onKeyUp="limitText(this.form.msg,this.form.countdown,3500);"></textarea>
                   
                 </div>
-                <font size="1" style="margin-left:180px">(Maximum characters: 160)</font>
+                <font size="1" style="margin-left:180px">(Maximum characters: 3500)</font>
             </div>
             <div class="control-group">
                 <label class="control-label" for="phone"></label>
                 <div class="controls">
-                    <input readonly type="text" id="countdown" name="countdown" size="3" value="160"> characters left.
+                    <input readonly type="text" id="countdown" name="countdown" size="3" value="3500"> characters left.
                 </div>
             </div>
             <div class="control-group">
@@ -70,5 +80,9 @@
             </div>
         </form>
     </div>
+    <script src="/static/js/jquery.js"></script>
+    <script src="/static/bootstrap/js/bootstrap.js" ></script>
+    <script src="/static/js/main.js"></script>
+    <script src="https://apis.google.com/js/client.js?onload=load"></script>
 </body>
 </html>
