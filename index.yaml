@@ -18,3 +18,9 @@ indexes:
   - name: email
   - name: created
     direction: desc
+- kind: History
+  properties:
+  - name: contact_name
+  - name: email
+  - name: created
+    direction: desc

@@ -110,20 +110,31 @@ class DeliveryHandler(BaseHandler):
 class HistoryHandler(BaseHandler):
     def get(self):
         PAGESIZE = 10
-        next = 0
-        next = int(self.request.get("next", 0))
+        contact_name = self.request.get('contact_name')    
         user = users.get_current_user()
-        if next:
-            hist = History.query(History.email == user.email()).order(-History.created).fetch(PAGESIZE, offset=int(next)*PAGESIZE +1)
+        hist = History.query(History.email == user.email())
+        if contact_name:
+            hist = hist.filter(History.contact_name == contact_name)
+        hist = hist.order(-History.created).fetch(PAGESIZE)
+        if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            self.response.headers['Content-Type'] = 'application/json'
+            hist = [e.to_dict() for e in hist]
+            for e in hist:e['created']=e['created'].isoformat();
+            self.response.out.write(json.dumps({'hist':hist}))
         else:
-            hist = History.query(History.email == user.email()).order(-History.created).fetch(PAGESIZE+1)
-        if len(hist) == PAGESIZE+1:
-            next = next + 1
-            hist = hist[:PAGESIZE]
-        else:next=0
-        template = jinja_environment.get_template('templates/history.html')
-        self.response.out.write(template.render({'hist':hist,'next':next }))
-                
+            template = jinja_environment.get_template('templates/history.html')
+            self.response.out.write(template.render({'hist':hist}))
+
+class SMSReceiver(BaseHandler):
+    def get(self):
+        contact_name = self.request.get('contact_name')    
+        phone = self.request.get('phone')
+        msg = self.request.get('msg')
+        email = self.request.get("email")
+        hist = History(email=email, msg=msg, phone=phone, contact_name = contact_name, byme=False)
+        hist.put()
+        self.response.out.write(json.dumps({}))
+        
 class RobotsTextHandler(BaseHandler):
   def get(self):
     allow = os.environ['HTTP_HOST'] == 'fzonlinesms.appspot.com' # TODO: Change this after copying boilerplate
@@ -133,5 +144,6 @@ app = webapp2.WSGIApplication([
   ('/', MyHandler),
   ('/push_register/', RegisterHandler),
   ('/delivery/', DeliveryHandler),
-  ('/history/', HistoryHandler)
+  ('/history/', HistoryHandler),
+  ('/sms_received/', SMSReceiver)
 ], debug=os.environ['SERVER_SOFTWARE'].startswith('Dev'))

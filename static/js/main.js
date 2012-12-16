@@ -56,19 +56,21 @@ function auth() {
       'client_id': '762117796319.apps.googleusercontent.com',
       'scope': 'https://www.google.com/m8/feeds'
     };
-    gapi.auth.authorize(config, function() {
-      token = gapi.auth.getToken();
-      
-      if(! token){
-        $('#page-loader').hide();
-        $('#errormsg').html("Unable to Fetch Contacts from Google").show();
-      } else{
-        params = $.param(token);
-        token.alt='json';
-        get_contacts();
-      }
-      
+    gapi.auth.init(function(){
+        gapi.auth.authorize(config, function() {
+          token = gapi.auth.getToken();
+          
+          if(! token){
+            $('#page-loader').hide();
+            $('#errormsg').html("Unable to Fetch Contacts from Google").show();
+          } else{
+            params = $.param(token);
+            token.alt='json';
+            get_contacts();
+          }      
+        });
     });
+    
 }
 function get_contacts(){
     $.ajax({
@@ -118,19 +120,88 @@ function get_contacts(){
                 $('.iso-container').append('<li class="item" id="_'+i+'"><img src="'+contacts[k].photo+'" class="img-polaroid" width="96" height="96"><span class="name img-caption">'+k+'</span></img></li>');
             }
             init_isotope();
+            $("html").niceScroll({cursorcolor:'#999'});
             $('.item').bind('click', function(){
                 var name = $(this).find('span').html();
                 $('#contact_name2').val(name);
-                $('#phone2').val(contacts[name].phone[0])
-                $('#sms-modal-label').html("Send SMS to " + name);
+                var html='';
+                for(var i=0; i<contacts[name].phone.length; i++){
+                    html+='<option value="'+contacts[name].phone[i]+'">'+contacts[name].phone[i]+'</option>';
+                }
+                $('#phone2').html(html);
+                $('#sms-modal-label').html(name);
                 $('#sms-modal .alert').hide();
+                $('.modal-form-div').show();
+                $('.history').hide();
+                $('.history-loader').hide();
+                $('.historymsg').hide();
+                $('.history table').hide();
+                $('.send-sms-action').hide();
+                $('.view-history-action').show();
+                $('.modal-form-div').show();
+                $('#modal-submit').show();
                 $('#sms-modal').modal();
+                
             });
             $('#page-loader').hide();
         }
     });
 }
+function fetch_history(contact_name){
+    $.ajax({
+        url:'/history/?contact_name='+contact_name,
+        success:function(data){
+            var html = '';
+            for(var i = 0; i<data.hist.length; i++){
+                html+='<tr>'
+                var h = data.hist[i];
+                if (h.sent && h.byme)
+                    html+='<td><span class="label label-success">Sent</span></td>';
+                else if (! h.byme)
+                    html+='<td><span class="label label-info">Received</span></td>';
+                else
+                    html+='<td><span class="label">Pending</span></td>';
+                html+='<td>'+h.contact_name+'</td>';
+                html+='<td>'+h.phone+'</td>';
+                html+='<td>'+h.msg+'</td>';
+                html+='<td class="dt">'+h.created+'</td>';
+            }            
+            $('.history tbody').html(html);
+            $('.dt').prettyDate();
+            $('.history-loader').hide();
+            if(! data.hist.length)
+                $('.historymsg').show();
+            else{
+                $('.history table').show();
+                $(".modal-body").niceScroll({cursorcolor:'#999'});
+            }
+        }
+    })
+}
 $(function(){
+    
+    //$('#sms-modal').on('hidden', function () {
+    //    $("html").niceScroll({cursorcolor:'#999'});
+    //});
+    $('.view-history-action').bind('click', function(){
+        $('.modal-form-div').hide();
+        $('.history').show();
+        $('.history-loader').show();
+        fetch_history($('#sms-modal-label').html());
+        $(this).hide();        
+        $('#modal-submit').hide();
+        $('.send-sms-action').show();
+    });
+    $('.send-sms-action').bind('click', function(){
+        $('.history').hide();
+        $('.history-loader').hide();
+        $('.historymsg').hide();
+        $('.history table').hide();
+        $('.send-sms-action').hide();
+        $('.view-history-action').show();
+        $('#modal-submit').show();
+        $('.modal-form-div').show();
+    })
     $('.dt').prettyDate();
     $("#sms-form").submit(function(e){
         e.preventDefault();
@@ -141,15 +212,18 @@ $(function(){
             $("#phone").val(val);
             var data = $(this).serialize();
             $.post('/', data, function(data){
-                if(data.status==200){
-                    
+                if(JSON.parse(data).status==200){
+                    $('#successmsg').html("Message Relayed").show();
+                    setTimeout(function(){$('#successmsg').hide()}, 5000);
                 } else {
                     $('#errormsg').html("Invalid Contact Name or Phone Number").show();
+                    setTimeout(function(){$('#errormsg').hide()}, 5000);
                 }           
             });
             return false;
         }
         $('#errormsg').html("Invalid Contact Name or Phone Number").show();
+        setTimeout(function(){$('#errormsg').hide()}, 5000);
         return false;
     });
     $("#sms-form-modal").submit(function(e){
@@ -160,6 +234,7 @@ $(function(){
                 $('#sms-modal').modal('hide');
             } else {
                 $('#sms-modal .alert').show();
+                setTimeout(function(){$('#sms-modal .alert').hide()}, 5000);
             }           
         });
         return false;

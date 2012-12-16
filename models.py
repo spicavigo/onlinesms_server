@@ -23,3 +23,4 @@ class History(ndb.Model):
     phone = ndb.StringProperty()
     sent = ndb.BooleanProperty(default=False)
     created = ndb.DateTimeProperty(auto_now_add=True)
+    byme = ndb.BooleanProperty(default=True)

@@ -57,10 +57,14 @@
         <tbody>
         {% for h in hist %}
             <tr>
+                {% if h.byme %}
                 {% if h.sent %}
                 <td><span class="label label-success">Sent</span></td>
                 {% else %}
                 <td><span class="label">Pending</span></td>
+                {% endif %}
+                {% else %}
+                <td><span class="label label-info">Received</span></td>
                 {% endif %}
                 <td>{{h.contact_name}}</td>
                 <td>{{h.phone}}</td>

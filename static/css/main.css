@@ -1,3 +1,31 @@
+.view-history-action{
+    cursor:pointer;
+    padding:5px;
+    margin-right:10px;
+}
+.send-sms-action{
+    cursor:pointer;
+    padding:5px;
+    margin-right:10px;
+    display:none;
+}
+.history-loader{
+    display:none;
+    text-align:center;
+    margin-top:100px;
+}
+.historymsg{
+    display:none;
+}
+.history table{
+    display:none;
+}
+#sms-modal{
+    min-height:408px;
+}
+#sms-modal .modal-body{
+    min-height:300px;
+}
 #page-loader {
     position: absolute;
     top: 70px;
@@ -5,11 +33,21 @@
     left: 0;
     right: 0;
     background-color: white;
-    z-index: 10000;
+    z-index: 100;
     display: none;
     text-align: center;
     width: 100%;
-    padding-top: 25px;
+    padding-top: 50px;
+}
+.helpmsg{
+    position: absolute;
+    display:block;
+    z-index:101;
+    top: 70px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    padding-top: 5px;
 }
 .control-group{
     margin-bottom:0;
