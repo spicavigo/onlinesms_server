@@ -50,15 +50,16 @@ class MyHandler(webapp2.RequestHandler):
         token = q.get()
         status = 100
         if token:
-            status = 200
-            
-            hist = History(email=user.email(), msg=msg, phone=phone, contact_name = contact_name)
-            hist.put()
-            airship.push({
-                "android": {
-                     "extra": {"msgid": str(hist.key.id()), "phone": phone, "msg":msg}
-                }
-            }, apids=[token.apid])
+            status = 101
+            if len(phone) and len(msg):
+                status = 200
+                hist = History(email=user.email(), msg=msg, phone=phone, contact_name = contact_name)
+                hist.put()
+                airship.push({
+                    "android": {
+                         "extra": {"msgid": str(hist.key.id()), "phone": phone, "msg":msg}
+                    }
+                }, apids=[token.apid])
         
         
         if False:

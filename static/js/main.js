@@ -216,7 +216,7 @@ $(function(){
                     $('#successmsg').html("Message Relayed").show();
                     setTimeout(function(){$('#successmsg').hide()}, 5000);
                 } else {
-                    $('#errormsg').html("Invalid Contact Name or Phone Number").show();
+                    $('#errormsg').html("Invalid Contact Name or Phone Number or Message").show();
                     setTimeout(function(){$('#errormsg').hide()}, 5000);
                 }           
             });
@@ -232,10 +232,15 @@ $(function(){
         $.post('/', data, function(data){
             if(JSON.parse(data).status==200){
                 $('#sms-modal').modal('hide');
-            } else {
+            } else if(JSON.parse(data).status==100){
+                $('#sms-modal .alert').html('Your phone is not yet registered. Install <a target="_blank" href="https://play.google.com/store/apps/details?id=com.fauzism.onlinesms">Online SMS</a> app on your Android Phone from Play Store and register.');
                 $('#sms-modal .alert').show();
                 setTimeout(function(){$('#sms-modal .alert').hide()}, 5000);
-            }           
+            } else {
+                $('#sms-modal .alert').html('Empty Phone Number or Message');
+                $('#sms-modal .alert').show();
+                setTimeout(function(){$('#sms-modal .alert').hide()}, 5000);
+            }      
         });
         return false;
     })
