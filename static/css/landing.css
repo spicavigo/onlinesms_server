@@ -132,6 +132,9 @@ h1{
     margin-left: 12px;
     background-position: 0px -35px;
 }
+.info ul{
+    margin-top:0px;
+}
 .info li{
     margin-bottom:5px;
 }
