@@ -54,20 +54,21 @@ function load() {
 function auth() {
     var config = {
       'client_id': '762117796319.apps.googleusercontent.com',
-      'scope': 'https://www.google.com/m8/feeds'
+      'scope': 'https://www.google.com/m8/feeds',
+      'immediate':true
     };
     gapi.auth.init(function(){
         gapi.auth.authorize(config, function() {
-          token = gapi.auth.getToken();
+            token = gapi.auth.getToken();
           
-          if(! token){
-            $('#page-loader').hide();
-            $('#errormsg').html("Unable to Fetch Contacts from Google").show();
-          } else{
-            params = $.param(token);
-            token.alt='json';
-            get_contacts();
-          }      
+            if(! token){
+                $('#page-loader').hide();
+                $('#errormsg').html("Unable to Fetch Contacts from Google").show();
+            } else{
+                params = $.param(token);
+                token.alt='json';
+                get_contacts();
+            }      
         });
     });
     

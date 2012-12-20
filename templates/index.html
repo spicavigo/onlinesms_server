@@ -3,23 +3,10 @@
   <head>
     <meta charset="utf-8">
     <title>Online SMS</title>
-    <link href="/static/bootstrap/css/bootstrap.css" rel="stylesheet">
-    <link href="/static/css/main.css" rel="stylesheet">
-	<style>
-	.container {
-		background: #fff;
-	}
-	#alert {
-		display: none;
-	}
-	.row{
-	    margin-left:0px;
-	}
-	.navbar .brand{
-	    font-size:44px;
-	    color:#113;
-	}
-	</style>
+    <link href="/static/bootstrap/css/bootstrap.css?v=1" rel="stylesheet">
+    <link href="/static/css/main.css?v=1" rel="stylesheet">
+    <link href='http://fonts.googleapis.com/css?family=Lato:100italic,900' rel='stylesheet' type='text/css'>
+	<link href='http://fonts.googleapis.com/css?family=Josefin+Slab:300,400' rel='stylesheet' type='text/css'>
 	
 	<script language="javascript" type="text/javascript">
     function limitText(limitField, limitCount, limitNum) {
@@ -37,12 +24,8 @@
 <body>
     <div class="navbar">
       <div class="navbar-inner">
-        <a class="brand" href="#"><img src="/static/logo.png"/><span style="font-weight:bold;padding-left:10px">Online SMS</span></a>
-        <ul class="nav" style="top:28px">
-            <li><a href="/history/">History</a></li>
-            <li class="for_number"><a href="#" onclick="send_to_number(); return false;">Send to Phone #</a></li>
-            <li class="for_contact active"><a href="#" onclick="send_to_contact(); return false;">Send to Contact</a></li>
-        </ul>
+        <a class="brand" href="#"><span style="">Online SMS</span></a>
+        <a class="logout" href="{{logout}}">Logout</a>
       </div>
     </div>
     <div class="helpmsg alert alert-warning">
@@ -180,7 +163,7 @@
     <script src="/static/bootstrap/js/bootstrap.js" ></script>
     <script src="/static/js/isotope.js"></script>
     <script src="/static/js/filter.js"></script>
-    <script src="/static/js/main.js"></script>
+    <script src="/static/js/main.js?v=1"></script>
     <script src="https://apis.google.com/js/client.js?onload=load"></script>
 </body>
 </html>

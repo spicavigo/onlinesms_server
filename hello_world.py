@@ -34,9 +34,10 @@ class MyHandler(webapp2.RequestHandler):
             status = 100
             if token:status = 200
             template = jinja_environment.get_template('templates/index.html')
-            self.response.out.write(template.render({'status':status}))
+            self.response.out.write(template.render({'status':status, 
+                'logout':users.create_logout_url("/")}))
         else:
-            template = jinja_environment.get_template('templates/login.html')
+            template = jinja_environment.get_template('templates/landing.html')
             self.response.out.write(template.render({"path": users.create_login_url("/")}))
             
     def post(self):
