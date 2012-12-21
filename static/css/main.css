@@ -1,6 +1,12 @@
 a.brand{
     margin-top:10px;
 }
+.send-to-contact,.send-to-number{
+    padding-top:37px;
+}
+.send-to-number{
+    margin-top: 10px;
+}
 .logout{
     float: right;
     padding: 1px 10px;
@@ -170,6 +176,9 @@ a.brand{
 .row{
     margin-left:0px;
 }
+.navbar{
+    margin-bottom:0;
+}
 .navbar .brand{
     font-size:44px;
     color:#D2691E;
@@ -179,4 +188,153 @@ a.brand{
     -webkit-border-radius: 0px;
     -moz-border-radius: 0px;
     border-radius: 0px;
+}
+#sms-history{
+    width:480px;
+    position:fixed;
+    right:0px;
+    bottom:0;
+    height:100%;
+    background:white;
+    -webkit-box-shadow: 0px 0px 10px rgba(0,0,0,0.8); 
+    -moz-box-shadow: 0px 0px 10px rgba(0,0,0,0.8); 
+    box-shadow: 0px 0px 10px rgba(0,0,0,0.8);
+    z-index:101;
+}
+#sms-history .close {
+    float: left;
+    font-size: 25px;
+    font-weight: bold;
+    line-height: 25px;
+    color: black;
+    text-shadow: 0 1px 0 white;
+    opacity: 0.2;
+    padding-left:5px;
+    filter: alpha(opacity=20);
+}
+#sms-history .close:hover{
+    opacity:0.6;
+    filter: alpha(opacity=60);
+}
+.contact-title{
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+    font-family: 'Josefin Slab';
+    padding: 5px;
+    background: #DEB887;
+}
+#sms-history{
+    display:none;
+}
+#sms-history #phone2{
+    width:100%;
+    -webkit-border-radius: 0px;
+    -moz-border-radius: 0px;
+    border-radius: 0px;
+    margin-bottom:0px;
+}
+#sms-history textarea{
+    position:absolute;
+    bottom:0px;
+    width:466px;
+    max-height:100px;
+    border:solid 1px #c8c7c8;
+   -webkit-border-radius: 0px;
+    -moz-border-radius: 0px;
+    border-radius: 0px;
+    margin:0;
+}
+#sms-history .alert{
+   -webkit-border-radius: 0px;
+    -moz-border-radius: 0px;
+    border-radius: 0px;
+    margin-bottom: 0;
+}
+#sms-history .form-div{
+    width:100%;
+    height:100%;
+}
+#sms-history .msgs{
+    width: 470px;
+    min-height: 100%;
+    max-height:100%;
+    background:#FFFAFA;
+    padding:5px;
+    padding-bottom:10px;
+}
+.sms-item{
+    max-width:380px;
+    min-width:300px;
+    padding:5px;
+    padding-bottom:0px;
+    margin:0 5px 10px 5px;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    
+    color:#666;
+}
+.sms-item.sent, .sms-item.pending{
+    float:right;
+    border:1px solid #fefefe;
+    background:#F5F5DC;
+    text-align:right;
+    -webkit-box-shadow: 0px 0px 10px #BDB76B; 
+    -moz-box-shadow: 0px 0px 10px #BDB76B; 
+    box-shadow: 0px 0px 10px #BDB76B;
+    
+}
+.sms-item.pending .msg-date{
+    background:url('/static/img/single-tick.png') no-repeat center left;
+}
+.sms-item.sent .msg-date{
+    background:url('/static/img/double-tick.png') no-repeat center left;
+}
+.sms-item.recv{
+    float:left;
+    border:1px solid #fefefe;
+    background:#FFE4C4;
+    -webkit-box-shadow: 0px 0px 10px #DEB887; 
+    -moz-box-shadow: 0px 0px 10px #DEB887; 
+    box-shadow: 0px 0px 10px #DEB887;
+}
+.msg-date{
+    float: right;
+    font-size: 10px;
+    color: #888;
+    line-height: 13px;
+    padding-left:16px;
+}
+.clear{
+    clear:both;
+}
+.recv .msg-date{
+    float:right;
+}
+.sent .msg-date, .pending .msg-date{
+    float:left;
+}
+a:hover{
+    text-decoration:none;
+}
+
+.ribbon {
+    position: fixed;
+    background: #A52A2A;
+    color: white;
+    text-align: center;
+    left: 0;
+    top: 90px;
+    padding: 5px;
+}
+.ribbon a{
+    color: #301607;
+    font-weight: bold;
+    text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.3);
+}
+.ribbon:hover{
+    box-shadow: 0px 0px 28px #A0522D;
+    -webkit-box-shadow: 0px 0px 28px #A0522D; 
+    -moz-box-shadow: 0px 0px 28px #A0522D; 
 }

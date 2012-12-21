@@ -35,17 +35,21 @@ if ( typeof jQuery != "undefined" )
         });
     };
 
+function switch_tab(){
+    if($('.ribbon a').html()=="Send to Contact")
+        send_to_contact();
+    else
+        send_to_number();
+}
 function send_to_contact(){
     $('.send-to-contact').show();
     $('.send-to-number').hide();
-    $('.nav li').removeClass('active');
-    $('.for_contact').addClass('active');
+    $('.ribbon a').html("Send to Phone #")
 }
 function send_to_number(){
     $('.send-to-number').show();
     $('.send-to-contact').hide();
-    $('.nav li').removeClass('active');
-    $('.for_number').addClass('active');
+    $('.ribbon a').html("Send to Contact")
 }
 function load() {
     gapi.client.setApiKey('AIzaSyAUuoxYS81W9KvpXJCZX2NjURVMoMCswII');
@@ -54,8 +58,7 @@ function load() {
 function auth() {
     var config = {
       'client_id': '762117796319.apps.googleusercontent.com',
-      'scope': 'https://www.google.com/m8/feeds',
-      'immediate':true
+      'scope': 'https://www.google.com/m8/feeds'
     };
     gapi.auth.init(function(){
         gapi.auth.authorize(config, function() {
@@ -121,28 +124,23 @@ function get_contacts(){
                 $('.iso-container').append('<li class="item" id="_'+i+'"><img src="'+contacts[k].photo+'" class="img-polaroid" width="96" height="96"><span class="name img-caption">'+k+'</span></img></li>');
             }
             init_isotope();
-            $("html").niceScroll({cursorcolor:'#999'});
+            $("body").niceScroll({cursorcolor:'#999'});
             $('.item').bind('click', function(){
+                $('#sms-history').show('slide', {direction: 'right'}, 300, function(){
+                    $(histScroll.cursor[0]).parent().css('left', 'auto').css('right',0);
+                    $('#sms-history textarea').focus();
+                    histScroll.scrollTop(histScroll.getContentSize().h);
+                });
                 var name = $(this).find('span').html();
-                $('#contact_name2').val(name);
+                $('#sms-history .contact-title').html(name);
+                $('#sms-history #contact_name2').val(name);
                 var html='';
                 for(var i=0; i<contacts[name].phone.length; i++){
                     html+='<option value="'+contacts[name].phone[i]+'">'+contacts[name].phone[i]+'</option>';
                 }
-                $('#phone2').html(html);
-                $('#sms-modal-label').html(name);
-                $('#sms-modal .alert').hide();
-                $('.modal-form-div').show();
-                $('.history').hide();
-                $('.history-loader').hide();
-                $('.historymsg').hide();
-                $('.history table').hide();
-                $('.send-sms-action').hide();
-                $('.view-history-action').show();
-                $('.modal-form-div').show();
-                $('#modal-submit').show();
-                $('#sms-modal').modal();
-                
+                $('#sms-history #phone2').html(html);
+                calc_height();
+                fetch_history(name);
             });
             $('#page-loader').hide();
         }
@@ -154,36 +152,39 @@ function fetch_history(contact_name){
         success:function(data){
             var html = '';
             for(var i = 0; i<data.hist.length; i++){
-                html+='<tr>'
+                var pos;
+                var status;
                 var h = data.hist[i];
                 if (h.sent && h.byme)
-                    html+='<td><span class="label label-success">Sent</span></td>';
+                    status='sent';
                 else if (! h.byme)
-                    html+='<td><span class="label label-info">Received</span></td>';
+                    status='recv';
                 else
-                    html+='<td><span class="label">Pending</span></td>';
-                html+='<td>'+h.contact_name+'</td>';
-                html+='<td>'+h.phone+'</td>';
-                html+='<td>'+h.msg+'</td>';
-                html+='<td class="dt">'+h.created+'</td>';
-            }            
-            $('.history tbody').html(html);
-            $('.dt').prettyDate();
-            $('.history-loader').hide();
-            if(! data.hist.length)
-                $('.historymsg').show();
-            else{
-                $('.history table').show();
-                $(".modal-body").niceScroll({cursorcolor:'#999'});
+                    status='pending';
+                var date = prettyDate(h.created);
+                html = html + '<div class="sms-item '+status+'"><div>'+h.msg+'</div><div class="msg-date">'+date+'</div></div>';
+                html = html + '<div class="clear"></div>';
             }
+            $('#sms-history .msgs').html(html);
+            histScroll.scrollTop(histScroll.getContentSize().h);
         }
     })
 }
+function calc_height(){
+    var h = $('.contact-title').height()+10;
+    if($('#sms-history .alert:visible').length)h=h+$('#sms-history .alert').height();
+    h=h+$('#sms-history textarea').height()+20;
+    h=h+$('#sms-history select').height()+14;
+    h=window.innerHeight-h;
+    $('#sms-history .msgs').css('min-height', h).css('max-height',h);
+    return h;
+}
 $(function(){
+    histScroll = $("#sms-history .msgs").niceScroll({cursorcolor:'#999'});
     
-    //$('#sms-modal').on('hidden', function () {
-    //    $("html").niceScroll({cursorcolor:'#999'});
-    //});
+    $('#sms-history .close').bind('click', function(){
+        $('#sms-history').hide('slide', {direction: 'right'}, 500);
+    });
     $('.view-history-action').bind('click', function(){
         $('.modal-form-div').hide();
         $('.history').show();
@@ -244,5 +245,38 @@ $(function(){
             }      
         });
         return false;
-    })
+    });
+    $('#sms-history textarea').autosize({append: "\n", callback:calc_height});
+    $('#sms-history textarea').bind('keypress', function(e) {
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code != 13) return;
+        e.preventDefault();
+        if($(this).val()=='')return;
+        var data = $('#sms-history form').serialize();
+        $(this).val('');
+
+        $.post('/', data, function(data){
+            var data = JSON.parse(data);
+            if(data.status==200){
+                var html = '<div class="sms-item pending"><div>'+data.msg.msg+'</div><div class="msg-date">'+prettyDate(data.msg.created)+'</div></div>';
+                html = html + '<div class="clear"></div>';
+                $('#sms-history .msgs').append(html);
+                calc_height();
+                histScroll.scrollTop(histScroll.getContentSize().h);
+            } else if(data.status==100){
+                $('#sms-history .alert').html('Your phone is not yet registered. Install <a target="_blank" href="https://play.google.com/store/apps/details?id=com.fauzism.onlinesms">Online SMS</a> app on your Android Phone from Play Store and register.');
+                $('#sms-history .alert').show();
+                calc_height();
+                histScroll.scrollTop(histScroll.getContentSize().h);
+                setTimeout(function(){$('#sms-history .alert').slideUp('slow', calc_height)}, 5000);
+            } else {
+                $('#sms-history .alert').html('Empty Phone Number or Message');
+                $('#sms-history .alert').show();
+                calc_height();
+                histScroll.scrollTop(histScroll.getContentSize().h);
+                setTimeout(function(){$('#sms-history .alert').slideUp('slow', calc_height)}, 5000);
+            }      
+        });
+    });
+    window.onresize = calc_height;
 })

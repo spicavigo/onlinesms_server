@@ -50,6 +50,7 @@ class MyHandler(webapp2.RequestHandler):
         q = Token.query(Token.email == user.email())
         token = q.get()
         status = 100
+        hist=''
         if token:
             status = 101
             if len(phone) and len(msg):
@@ -61,12 +62,14 @@ class MyHandler(webapp2.RequestHandler):
                          "extra": {"msgid": str(hist.key.id()), "phone": phone, "msg":msg}
                     }
                 }, apids=[token.apid])
+                hist = hist.to_dict()
+                hist['created']=hist['created'].isoformat();
         
         
         if False:
             template = jinja_environment.get_template('templates/index.html')
             self.response.out.write(template.render({'status':status}))
-        else:self.response.out.write(json.dumps({'status':status}))
+        else:self.response.out.write(json.dumps({'status':status, 'msg':hist}))
         
 class RegisterHandler(BaseHandler):
     def get(self):
@@ -111,7 +114,7 @@ class DeliveryHandler(BaseHandler):
 
 class HistoryHandler(BaseHandler):
     def get(self):
-        PAGESIZE = 10
+        PAGESIZE = 50
         contact_name = self.request.get('contact_name')    
         user = users.get_current_user()
         hist = History.query(History.email == user.email())

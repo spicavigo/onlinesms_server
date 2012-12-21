@@ -5,7 +5,6 @@
     <title>Online SMS</title>
     <link href="/static/bootstrap/css/bootstrap.css?v=1" rel="stylesheet">
     <link href="/static/css/main.css?v=1" rel="stylesheet">
-    <link href='http://fonts.googleapis.com/css?family=Lato:100italic,900' rel='stylesheet' type='text/css'>
 	<link href='http://fonts.googleapis.com/css?family=Josefin+Slab:300,400' rel='stylesheet' type='text/css'>
 	
 	<script language="javascript" type="text/javascript">
@@ -69,7 +68,10 @@
             </div>
         </form>
     </div>
-    <div class="container well send-to-contact" id="contact-list">
+    <span class="ribbon">
+       <a href="#" onclick="switch_tab();return false;">Send to Phone #</a>
+    </span>
+    <div class="container-fluid well send-to-contact" id="contact-list">
         <div>
             <div class="input-append" style="text-align:center">
 			    <input type="text" class="span6" name="search" id="search" value="" placeholder="Start typing contact name..." autocomplete="off" /> 
@@ -81,89 +83,46 @@
 		<ul class="iso-container clearfix">
 		</ul>
     </div>
-    <div id="sms-modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="sms-modal-label" aria-hidden="true">
-        <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-            <div class="pull-right">
-                <span class="view-history-action label label-info">View SMS History</span>
-            </div>
-            <div class="pull-right">
-                <span class="send-sms-action label label-info">Send SMS</span>
-            </div>
-            <h3 id="sms-modal-label"></h3>
-            
+    <div id="sms-history">
+        <button type="button" class="close">&times;</button>
+        <div class="contact-title">Yousuf Fauzan</div>
+        
+        <div class="form-div">
+            <form>
+                <div class="alert alert-error" style="display:none">
+                    
+                </div>
+                <input type="hidden" id="contact_name2" name="contact_name">
+                <div class="control-group">
+                    <div class="controls">
+                        <select id="phone2" name="phone">
+                        </select>
+                    </div>
+                </div>
+                <input type="hidden" id="isajax" name="isajax" value="1">
+                <div class="msgs"></div>
+                
+                <div class="control-group">
+                    <div class="controls">
+                      <textarea name="msg" id="msg2"></textarea>                          
+                    </div>
+                </div>
+            </form>
         </div>
-        <form id="sms-form-modal" class="form" method="post" style="margin-bottom:0" action="/">
-            <div class="modal-body">
-                <div class="history">
-                    <div class="history-loader">
-                        <h4>Fetching History...</h4>
-                        <img src="/static/img/loader.gif" alt="loader">
-                    </div>
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Status</th>
-                                <th>Name</th>
-                                <th>Phone</th>
-                                <th>Message</th>
-                                <th>Date</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        
-                        </tbody>
-                    </table>
-                    <div class="historymsg alert alert-error">
-                        You have not sent any SMS yet.
-                    </div>
-                </div>
-                <div class="modal-form-div">
-                    <div class="alert alert-error" style="display:none">
-                        
-                    </div>
-                    <input type="hidden" id="contact_name2" name="contact_name">
-                    <div class="control-group">
-                        <label class="control-label" for="phone">Phone Number</label>
-                        <div class="controls">
-                            <select id="phone2" name="phone">
-                            </select>
-                        </div>
-                    </div>
-                    <input type="hidden" id="isajax" name="isajax" value="1">
-                    <div class="control-group">
-                        <label class="control-label" for="msg">Message</label>
-                        <div class="controls">
-                          <textarea style="width:auto;margin-bottom: 0;" name="msg" id="msg2" rows="5" cols="60" onKeyDown="limitText(this.form.msg2,this.form.countdown,3500);" onKeyUp="limitText(this.form.msg2,this.form.countdown,3500);"></textarea>
-                          
-                        </div>
-                        <font size="1" style="margin-left:180px">(Maximum characters: 3500)</font>
-                    </div>
-                    <div class="control-group">
-                        <label class="control-label" for="phone"></label>
-                        <div class="controls">
-                            <input readonly type="text" id="countdown2" name="countdown" size="3" value="3500"> characters left.
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-                <button id="modal-submit" type="submit" class="btn btn-primary">Send</button>
-            </div>
-        </form>
     </div>
-    
     <div id="page-loader" style="display: block;">
 		<h3>Fetching Contacts from Google.</h3>
 		<img src="/static/img/loader.gif" alt="loader">
 	</div>
     <script src="/static/js/jquery.js"></script>
+    <script src="http://jquery-ui.googlecode.com/svn/tags/latest/ui/jquery.effects.core.js"></script>
+    <script src="http://jquery-ui.googlecode.com/svn/tags/latest/ui/jquery.effects.slide.js"></script>
     <script src="/static/js/jquery.nicescroll.js"></script>
     <script src="/static/bootstrap/js/bootstrap.js" ></script>
     <script src="/static/js/isotope.js"></script>
     <script src="/static/js/filter.js"></script>
-    <script src="/static/js/main.js?v=1"></script>
+    <script src="/static/js/autosize.js"></script>
+    <script src="/static/js/main.js?v=2"></script>
     <script src="https://apis.google.com/js/client.js?onload=load"></script>
 </body>
 </html>
