@@ -114,6 +114,7 @@
 		<h3>Fetching Contacts from Google.</h3>
 		<img src="/static/img/loader.gif" alt="loader">
 	</div>
+	<div id="sms-notification"></div>
     <script src="/static/js/jquery.js"></script>
     <script src="http://jquery-ui.googlecode.com/svn/tags/latest/ui/jquery.effects.core.js"></script>
     <script src="http://jquery-ui.googlecode.com/svn/tags/latest/ui/jquery.effects.slide.js"></script>
@@ -124,5 +125,48 @@
     <script src="/static/js/autosize.js"></script>
     <script src="/static/js/main.js?v=2"></script>
     <script src="https://apis.google.com/js/client.js?onload=load"></script>
+    <script type="text/javascript" src="/_ah/channel/jsapi"></script>
+    <script>
+
+        onOpened = function() {
+            connected = true;
+           // sendMessage('opened');
+        };
+        onMessage = function(msg) {
+            var data = JSON.parse(msg.data);
+            if(data.type == 'delivery') onDelivery(data);
+            else if (data.type == 'sms') onNewSMS(data);
+            else return;
+            
+        };
+        onError = function(err) {
+        //    alert(err);
+        };
+        onClose = function() {
+           // alert("close");
+         //   connected = false;
+        };
+        // open new session
+        channel = new goog.appengine.Channel('{{ token }}');
+        socket = channel.open();
+        socket.onopen = onOpened;
+        socket.onmessage = onMessage;
+        socket.onerror = onError;
+        socket.onclose = onClose;
+    </script>
+
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-19256750-3']);
+      _gaq.push(['_trackPageview', '/send_to_contact']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+
+    </script>
 </body>
 </html>

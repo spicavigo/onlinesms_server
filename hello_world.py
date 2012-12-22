@@ -14,6 +14,7 @@ from datetime import date, datetime
 
 from models import Token, History
 from google.appengine.ext import ndb, db
+from google.appengine.api import channel
 
 import urbanairship
 f=open('ua_prop')
@@ -34,8 +35,9 @@ class MyHandler(webapp2.RequestHandler):
             status = 100
             if token:status = 200
             template = jinja_environment.get_template('templates/index.html')
+            token = channel.create_channel(user.email())
             self.response.out.write(template.render({'status':status, 
-                'logout':users.create_logout_url("/")}))
+                'logout':users.create_logout_url("/"), 'token':token}))
         else:
             template = jinja_environment.get_template('templates/landing.html')
             self.response.out.write(template.render({"path": users.create_login_url("/")}))
@@ -62,10 +64,11 @@ class MyHandler(webapp2.RequestHandler):
                          "extra": {"msgid": str(hist.key.id()), "phone": phone, "msg":msg}
                     }
                 }, apids=[token.apid])
+                id = hist.key.id()
                 hist = hist.to_dict()
                 hist['created']=hist['created'].isoformat();
-        
-        
+                hist['id'] = id
+                hist['type'] = 'sms'        
         if False:
             template = jinja_environment.get_template('templates/index.html')
             self.response.out.write(template.render({'status':status}))
@@ -106,6 +109,11 @@ class DeliveryHandler(BaseHandler):
         if item:
             item.sent = True
             item.put()
+            message = json.dumps({
+                'type': 'delivery',
+                'id': msgid
+            })
+            channel.send_message(item.email, message)
         
         if cb:
             self.response.out.write(cb+'(' + json.dumps({}) +');')
@@ -123,9 +131,11 @@ class HistoryHandler(BaseHandler):
         hist = hist.order(-History.created).fetch(PAGESIZE)
         if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             self.response.headers['Content-Type'] = 'application/json'
-            hist = [e.to_dict() for e in hist]
-            for e in hist:e['created']=e['created'].isoformat();
-            self.response.out.write(json.dumps({'hist':hist}))
+            hist = [[e.to_dict(), e.key.id()] for e in hist]
+            for e,id in hist:
+                e['created']=e['created'].isoformat();
+                e['id'] = id
+            self.response.out.write(json.dumps({'hist':[e[0] for e in hist]}))
         else:
             template = jinja_environment.get_template('templates/history.html')
             self.response.out.write(template.render({'hist':hist}))
@@ -138,6 +148,12 @@ class SMSReceiver(BaseHandler):
         email = self.request.get("email")
         hist = History(email=email, msg=msg, phone=phone, contact_name = contact_name, byme=False)
         hist.put()
+        id = hist.key.id()
+        hist = hist.to_dict()
+        hist['created']=hist['created'].isoformat();
+        hist['id'] = id
+        hist['type'] = 'sms'  
+        channel.send_message(email, json.dumps(hist))
         self.response.out.write(json.dumps({}))
         
 class RobotsTextHandler(BaseHandler):

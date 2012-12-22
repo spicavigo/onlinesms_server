@@ -36,10 +36,14 @@ if ( typeof jQuery != "undefined" )
     };
 
 function switch_tab(){
-    if($('.ribbon a').html()=="Send to Contact")
+    if($('.ribbon a').html()=="Send to Contact"){
+        _gaq.push(['_trackPageview', '/send_to_contact']);
         send_to_contact();
-    else
+    } else {
+        _gaq.push(['_trackPageview', '/send_to_number']);
         send_to_number();
+    }
+        
 }
 function send_to_contact(){
     $('.send-to-contact').show();
@@ -113,6 +117,7 @@ function get_contacts(){
                     source.pop();
                 }
             });
+            _gaq.push(['_trackEvent', 'google_contact', 'fetch', 'numbers', source.length]);
             $('#phone').typeahead({
                 source: source
             });
@@ -126,6 +131,7 @@ function get_contacts(){
             init_isotope();
             $("body").niceScroll({cursorcolor:'#999'});
             $('.item').bind('click', function(){
+                _gaq.push(['_trackEvent', 'sidebar', 'show']);
                 $('#sms-history').show('slide', {direction: 'right'}, 300, function(){
                     $(histScroll.cursor[0]).parent().css('left', 'auto').css('right',0);
                     $('#sms-history textarea').focus();
@@ -147,11 +153,13 @@ function get_contacts(){
     });
 }
 function fetch_history(contact_name){
+    _gaq.push(['_trackPageview', '/history']);
     $.ajax({
         url:'/history/?contact_name='+contact_name,
         success:function(data){
             var html = '';
-            for(var i = 0; i<data.hist.length; i++){
+            _gaq.push(['_trackEvent', 'history', 'fetch', 'count', data.hist.length]);
+            for(var i = data.hist.length-1; i>=0; i--){
                 var pos;
                 var status;
                 var h = data.hist[i];
@@ -162,13 +170,40 @@ function fetch_history(contact_name){
                 else
                     status='pending';
                 var date = prettyDate(h.created);
-                html = html + '<div class="sms-item '+status+'"><div>'+h.msg+'</div><div class="msg-date">'+date+'</div></div>';
+                html = html + '<div class="sms-item '+status+'" id="msg-' + h.id + '"><div>'+h.msg+'</div><div class="msg-date">'+date+'</div></div>';
                 html = html + '<div class="clear"></div>';
             }
             $('#sms-history .msgs').html(html);
             histScroll.scrollTop(histScroll.getContentSize().h);
         }
     })
+}
+function onDelivery(msg){
+    var id = msg.id;
+    console.log(id);
+    if ($('#msg-'+id).length){
+        $('#msg-'+id).removeClass('pending').addClass('sent');
+    }
+}
+function onNewSMS(msg){
+    if($('#sms-history:visible').length && ($('#sms-history .contact-title').html() == msg.contact_name)){
+        var status;
+        if (msg.sent && msg.byme)
+            status='sent';
+        else if (! msg.byme)
+            status='recv';
+        else
+            status='pending';
+        var date = prettyDate(msg.created);
+        var html = '<div class="sms-item '+status+'" id="msg-' + msg.id + '"><div>'+msg.msg+'</div><div class="msg-date">'+date+'</div></div>';
+        html = html + '<div class="clear"></div>';
+        $('#sms-history .msgs').append(html);
+        histScroll.scrollTop(histScroll.getContentSize().h);
+    } else {
+        $('#sms-notification').html("New message from " + msg.contact_name);
+        $('#sms-notification').show();
+        setTimeout(function(){$('#sms-notification').hide()}, 5000);
+    }
 }
 function calc_height(){
     var h = $('.contact-title').height()+10;
@@ -184,6 +219,7 @@ $(function(){
     
     $('#sms-history .close').bind('click', function(){
         $('#sms-history').hide('slide', {direction: 'right'}, 500);
+        _gaq.push(['_trackEvent', 'sidebar', 'close']);
     });
     $('.view-history-action').bind('click', function(){
         $('.modal-form-div').hide();
@@ -212,9 +248,11 @@ $(function(){
         if(source.indexOf(val)>-1) val = contacts[val][0];
         if(val.length>0){
             $("#phone").val(val);
+            _gaq.push(['_trackEvent', 'sendsms', 'bynumber', 'sending']);
             var data = $(this).serialize();
             $.post('/', data, function(data){
-                if(JSON.parse(data).status==200){
+                _gaq.push(['_trackEvent', 'sendsms', 'bynumber', 'sent', JSON.parse(data).status]);
+                if(JSON.parse(data).status==200){                    
                     $('#successmsg').html("Message Relayed").show();
                     setTimeout(function(){$('#successmsg').hide()}, 5000);
                 } else {
@@ -225,25 +263,8 @@ $(function(){
             return false;
         }
         $('#errormsg').html("Invalid Contact Name or Phone Number").show();
+        _gaq.push(['_trackEvent', 'sendsms', 'bynumber', 'fail_no_ajax']);
         setTimeout(function(){$('#errormsg').hide()}, 5000);
-        return false;
-    });
-    $("#sms-form-modal").submit(function(e){
-        e.preventDefault();
-        var data = $(this).serialize();
-        $.post('/', data, function(data){
-            if(JSON.parse(data).status==200){
-                $('#sms-modal').modal('hide');
-            } else if(JSON.parse(data).status==100){
-                $('#sms-modal .alert').html('Your phone is not yet registered. Install <a target="_blank" href="https://play.google.com/store/apps/details?id=com.fauzism.onlinesms">Online SMS</a> app on your Android Phone from Play Store and register.');
-                $('#sms-modal .alert').show();
-                setTimeout(function(){$('#sms-modal .alert').hide()}, 5000);
-            } else {
-                $('#sms-modal .alert').html('Empty Phone Number or Message');
-                $('#sms-modal .alert').show();
-                setTimeout(function(){$('#sms-modal .alert').hide()}, 5000);
-            }      
-        });
         return false;
     });
     $('#sms-history textarea').autosize({append: "\n", callback:calc_height});
@@ -255,10 +276,12 @@ $(function(){
         var data = $('#sms-history form').serialize();
         $(this).val('');
 
+        _gaq.push(['_trackEvent', 'sendsms', 'bycontact', 'sending']);
         $.post('/', data, function(data){
             var data = JSON.parse(data);
-            if(data.status==200){
-                var html = '<div class="sms-item pending"><div>'+data.msg.msg+'</div><div class="msg-date">'+prettyDate(data.msg.created)+'</div></div>';
+            _gaq.push(['_trackEvent', 'sendsms', 'bycontact', 'sent', data.status]);
+            if(data.status==200){                
+                var html = '<div class="sms-item pending" id="msg-'+ data.msg.id + '"><div>'+data.msg.msg+'</div><div class="msg-date">'+prettyDate(data.msg.created)+'</div></div>';
                 html = html + '<div class="clear"></div>';
                 $('#sms-history .msgs').append(html);
                 calc_height();

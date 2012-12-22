@@ -24,3 +24,7 @@ class History(ndb.Model):
     sent = ndb.BooleanProperty(default=False)
     created = ndb.DateTimeProperty(auto_now_add=True)
     byme = ndb.BooleanProperty(default=True)
+
+#class ChannelToken(nd.Model):
+#    email = ndb.StringProperty(indexed=True, required=True)
+#    token = ndb.StringProperty()

@@ -338,3 +338,17 @@ a:hover{
     -webkit-box-shadow: 0px 0px 28px #A0522D; 
     -moz-box-shadow: 0px 0px 28px #A0522D; 
 }
+#sms-notification{
+    display: none;
+    position: fixed;
+    bottom: 4px;
+    text-align: left;
+    font-size: 16px;
+    font-weight: bold;
+    font-family: 'Josefin Slab';
+    background: rgba(0, 0, 0, 0.8);
+    padding: 10px;
+    z-index: 102;
+    color: white;
+    text-shadow: 1px 1px 0px black;
+}
