@@ -61,7 +61,7 @@ function load() {
 }
 function auth() {
     var config = {
-      'client_id': '762117796319-o92mjutrl3ol3il5log1mbahh2c5ttl1.apps.googleusercontent.com',
+      'client_id': '762117796319.apps.googleusercontent.com',
       'scope': 'https://www.google.com/m8/feeds'
     };
     gapi.auth.init(function(){

@@ -46,7 +46,6 @@ function submit_sms(e) {
 
     _gaq.push(['_trackEvent', 'sendsms', 'bycontact', 'sending']);
     $.post('/', data, function(data){
-        console.log(data);
         var data = JSON.parse(data);
         _gaq.push(['_trackEvent', 'sendsms', 'bycontact', 'sent', data.status]);
         if(data.status==200){                
@@ -140,7 +139,6 @@ function get_contacts(){
         url: '/fetch_contacts/',
         dataType: 'json',
         success: function(data) {
-            console.log(data);
             for(var k in data){
                 source.push(k);
             }
@@ -200,7 +198,6 @@ function fetch_history(el, contact_name){
 }
 function onDelivery(msg){
     var id = msg.id;
-    console.log(id);
     if ($('#msg-'+id).length){
         $('#msg-'+id).removeClass('pending').addClass('sent');
     }
@@ -225,6 +222,7 @@ function onNewSMS(msg){
         var html = '<div class="sms-item '+status+'" id="msg-' + msg.id + '"><div>'+msg.msg+'</div><div class="msg-date">'+date+'</div></div>';
         html = html + '<div class="clear"></div>';
         el.find('.msgs').append(html);
+        el.find('.msg-container').scrollTop(el.find('.msg-container').height())
     } else {
         $('#sms-notification').html("New message from " + msg.contact_name);
         $('#sms-notification').show();

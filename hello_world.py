@@ -183,7 +183,6 @@ class ChannelReceiver(BaseHandler):
 
 class ContactReceiver(BaseHandler):
     def post(self):
-        logging.info("Hello")
         contacts = json.loads(self.request.get("contacts",'{}'))
         email = contacts['__email__online__sms'][0].lower()
         del contacts['__email__online__sms']

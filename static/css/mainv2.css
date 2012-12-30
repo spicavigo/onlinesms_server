@@ -15,7 +15,7 @@ a.brand{
     padding-left:0px;
     padding-right:0px;
     float:left;
-    background:burlywood;
+    background:#DEB887;
 }
 .send-to-contact .input-append{
     margin-bottom:0;
@@ -48,15 +48,15 @@ a.brand{
     font-weight: bold;
     font-family: 'Josefin Slab';
     padding: 5px;
-    background: burlywood;
-    text-shadow: 1px 1px -1px beige;
+    background: #DEB887;
+    text-shadow: 1px 1px -1px #F5F5DC;
     color: #444;*/
 }
 .item:last-child{
     border-bottom:1px solid white;
 }
 .item:hover{
-    background:beige;
+    background:#F5F5DC;
     color:#444;
     text-shadow: 0px 2px 3px #eee;
     width: 173px;
@@ -154,8 +154,8 @@ a.brand{
     font-weight: bold;
     font-family: 'Josefin Slab';
     padding: 5px;
-    background: burlywood;
-    text-shadow: 1px 1px -1px beige;
+    background: #DEB887;
+    text-shadow: 1px 1px -1px #F5F5DC;
     color: #444;
 }
 .sms-history{
@@ -309,7 +309,7 @@ a:hover{
     font-size: 13px;
     font-weight: bold;
     padding: 5px;
-    background: brown;
+    background: #A52A2A;
     opacity:0.8;
     cursor:pointer;
     width:140px;
@@ -318,9 +318,9 @@ a:hover{
 }
 .chatlink:hover{
     opacity:1;
-    box-shadow: 0px 0px 1px brown;
-    -webkit-box-shadow: 0px 0px 1px brown; 
-    -moz-box-shadow: 0px 0px 1px brown;
+    box-shadow: 0px 0px 1px #A52A2A;
+    -webkit-box-shadow: 0px 0px 1px #A52A2A; 
+    -moz-box-shadow: 0px 0px 1px #A52A2A;
 }
 .chatlink .close{
     float:left;
