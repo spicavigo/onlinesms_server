@@ -7,6 +7,9 @@ a.brand{
 .send-to-number{
     margin-top: 10px;
 }
+.send-to-number #sms-form{
+    margin-top:10px;
+}
 .send-to-contact{
     width:180px;
     padding-left:0px;

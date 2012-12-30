@@ -13,7 +13,7 @@ from base_handler import BaseHandler
 import json
 from datetime import date, datetime
 
-from models import Token, History
+from models import Token, History, Contacts
 from google.appengine.ext import ndb, db
 from google.appengine.api import channel
 

@@ -76,12 +76,16 @@ function switch_tab(){
 function send_to_contact(){
     $('.send-to-contact').show();
     $('.send-to-number').hide();
-    $('.ribbon a').html("Send to Phone #")
+    $('.ribbon a').html("Send to Phone #");
+    $('#open-chat-links').show();
+    $('.boxes').show();
 }
 function send_to_number(){
     $('.send-to-number').show();
     $('.send-to-contact').hide();
-    $('.ribbon a').html("Send to Contact")
+    $('.ribbon a').html("Send to Contact");
+    $('#open-chat-links').hide();
+    $('.boxes').hide();
 }
 
 function new_chatbox(num){
