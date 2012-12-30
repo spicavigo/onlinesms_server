@@ -1,6 +1,7 @@
 import os
 import webapp2
 import logging
+import time
 
 import jinja2
 
@@ -30,14 +31,25 @@ class MyHandler(webapp2.RequestHandler):
     def get(self):
         user = users.get_current_user()
         if user:
-            q = Token.query(Token.email == user.email())
+            q = Token.query(Token.email == user.email().lower())
             token = q.get()
+            if token and token.version:
+                template = jinja_environment.get_template('templates/index_with_contact.html')
+            else:
+                template = jinja_environment.get_template('templates/index.html')
             status = 100
             if token:status = 200
-            template = jinja_environment.get_template('templates/index.html')
-            token = channel.create_channel(user.email())
+            chat_token = self.request.cookies.get('token2', None)
+            if not chat_token:
+                chat_token = channel.create_channel(user.email().lower(), 1440)
+                expires = time.time() + 86400
+                self.response.headers.add_header(
+                    'Set-Cookie', 
+                    'token2=%s; expires=%s' \
+                      % (chat_token, time.strftime("%a, %d-%b-%Y %T GMT", time.gmtime(expires))))
+
             self.response.out.write(template.render({'status':status, 
-                'logout':users.create_logout_url("/"), 'token':token}))
+                'logout':users.create_logout_url("/"), 'token':chat_token}))
         else:
             template = jinja_environment.get_template('templates/landing.html')
             self.response.out.write(template.render({"path": users.create_login_url("/")}))
@@ -49,15 +61,17 @@ class MyHandler(webapp2.RequestHandler):
         contact_name = self.request.get('contact_name')
 
         user = users.get_current_user()
-        q = Token.query(Token.email == user.email())
+        email = user.email().lower()
+        q = Token.query(Token.email == email)
         token = q.get()
         status = 100
         hist=''
+        logging.debug(email + ' ' + phone + ' ' + msg + ' ' + contact_name)
         if token:
             status = 101
             if len(phone) and len(msg):
                 status = 200
-                hist = History(email=user.email(), msg=msg, phone=phone, contact_name = contact_name)
+                hist = History(email=email, msg=msg, phone=phone, contact_name = contact_name)
                 hist.put()
                 airship.push({
                     "android": {
@@ -69,27 +83,27 @@ class MyHandler(webapp2.RequestHandler):
                 hist['created']=hist['created'].isoformat();
                 hist['id'] = id
                 hist['type'] = 'sms'        
-        if False:
-            template = jinja_environment.get_template('templates/index.html')
-            self.response.out.write(template.render({'status':status}))
-        else:self.response.out.write(json.dumps({'status':status, 'msg':hist}))
+        self.response.out.write(json.dumps({'status':status, 'msg':hist}))
         
 class RegisterHandler(BaseHandler):
     def get(self):
         apid = self.request.get("apid")
-        email = self.request.get("email")
+        email = self.request.get("email",'').lower()
+        version = int(self.request.get("version", "0"))
         q = Token.query(Token.email == email)
         token = q.get()
         if token:
             token.apid = apid
             token.email = email
+            token.version = version
         else:
             q = Token.query(Token.apid == apid)
             token = q.get()
             if token:
                 token.apid = apid
                 token.email = email
-            else:token = Token(apid=apid, email=email)
+                token.version=version
+            else:token = Token(apid=apid, email=email, version=version)
         token.put()
 
         cb = self.request.get('callback')
@@ -125,7 +139,7 @@ class HistoryHandler(BaseHandler):
         PAGESIZE = 50
         contact_name = self.request.get('contact_name')    
         user = users.get_current_user()
-        hist = History.query(History.email == user.email())
+        hist = History.query(History.email == user.email().lower())
         if contact_name:
             hist = hist.filter(History.contact_name == contact_name)
         hist = hist.order(-History.created).fetch(PAGESIZE)
@@ -145,7 +159,7 @@ class SMSReceiver(BaseHandler):
         contact_name = self.request.get('contact_name')    
         phone = self.request.get('phone')
         msg = self.request.get('msg')
-        email = self.request.get("email")
+        email = self.request.get("email",'').lower()
         hist = History(email=email, msg=msg, phone=phone, contact_name = contact_name, byme=False)
         hist.put()
         id = hist.key.id()
@@ -156,6 +170,37 @@ class SMSReceiver(BaseHandler):
         channel.send_message(email, json.dumps(hist))
         self.response.out.write(json.dumps({}))
         
+class ChannelReceiver(BaseHandler):
+    def get(self):
+        user = users.get_current_user()
+        token = channel.create_channel(user.email().lower(), 1440)
+        expires = time.time() + 86400
+        self.response.headers.add_header(
+            'Set-Cookie', 
+            'token2=%s; expires=%s; path=/' \
+              % (token, time.strftime("%a, %d-%b-%Y %T GMT", time.gmtime(expires))))
+        self.response.out.write(json.dumps({'token':token}))
+
+class ContactReceiver(BaseHandler):
+    def post(self):
+        logging.info("Hello")
+        contacts = json.loads(self.request.get("contacts",'{}'))
+        email = contacts['__email__online__sms'][0].lower()
+        del contacts['__email__online__sms']
+        q = Contacts.query(Contacts.email == email)
+        c = q.get()
+        if c:c.data = contacts
+        else:c=Contacts(email=email, data=contacts)
+        c.put()
+        self.response.out.write(json.dumps({})) 
+
+class ContactFetchReceiver(BaseHandler):
+    def get(self):
+        user = users.get_current_user()
+        email = user.email().lower()
+        res = Contacts.query(Contacts.email==email).get().data        
+        self.response.out.write(json.dumps(res)) 
+                             
 class RobotsTextHandler(BaseHandler):
   def get(self):
     allow = os.environ['HTTP_HOST'] == 'fzonlinesms.appspot.com' # TODO: Change this after copying boilerplate
@@ -166,5 +211,8 @@ app = webapp2.WSGIApplication([
   ('/push_register/', RegisterHandler),
   ('/delivery/', DeliveryHandler),
   ('/history/', HistoryHandler),
-  ('/sms_received/', SMSReceiver)
+  ('/sms_received/', SMSReceiver),
+  ('/new_chid/', ChannelReceiver),
+  ('/save_contact/', ContactReceiver),
+  ('/fetch_contacts/', ContactFetchReceiver),
 ], debug=os.environ['SERVER_SOFTWARE'].startswith('Dev'))

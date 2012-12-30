@@ -4,7 +4,8 @@
     <meta charset="utf-8">
     <title>Online SMS</title>
     <link href="/static/bootstrap/css/bootstrap.css?v=1" rel="stylesheet">
-    <link href="/static/css/main.css?v=1" rel="stylesheet">
+    <link href="/static/css/gridster.css" rel="stylesheet">
+    <link href="/static/css/mainv2.css?v=1" rel="stylesheet">
 	<link href='http://fonts.googleapis.com/css?family=Josefin+Slab:300,400' rel='stylesheet' type='text/css'>
 	
 	<script language="javascript" type="text/javascript">
@@ -27,18 +28,18 @@
         <a class="logout" href="{{logout}}">Logout</a>
       </div>
     </div>
-    <div class="helpmsg alert alert-warning">
-    <button type="button" class="close" data-dismiss="alert">&times;</button>
-    Please ensure that your browser is not blocking Popups from http://sms.fauzism.com.
+    <span class="ribbon">
+       <a href="#" onclick="switch_tab();return false;">Send to Phone #</a>
+    </span>
+    {% if status is sameas 100 %}
+    <div class="helpmsg alert alert-error">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        Your phone is not yet registered. Install <a target="_blank" href="https://play.google.com/store/apps/details?id=com.fauzism.onlinesms">Online SMS</a> app on your Android Phone from Play Store and register.
     </div>
+    {% endif %}
     <div class="container well send-to-number" style="display:none">
         <div id="errormsg" class="alert alert-error" style="display:none"></div>
         <div id="successmsg" class="alert alert-success" style="display:none"></div>
-        {% if status is sameas 100 %}
-        <div class="alert alert-error">
-            Your phone is not yet registered. Install <a target="_blank" href="https://play.google.com/store/apps/details?id=com.fauzism.onlinesms">Online SMS</a> app on your Android Phone from Play Store and register.
-        </div>
-        {% endif %}
         <form id="sms-form" class="form-horizontal" method="post" action="/">
             <div class="control-group">
                 <label class="control-label" for="phone">Contact Name/Number</label>
@@ -68,22 +69,22 @@
             </div>
         </form>
     </div>
-    <span class="ribbon">
-       <a href="#" onclick="switch_tab();return false;">Send to Phone #</a>
-    </span>
+    
     <div class="container-fluid well send-to-contact" id="contact-list">
         <div>
-            <div class="input-append" style="text-align:center">
-			    <input type="text" class="span6" name="search" id="search" value="" placeholder="Start typing contact name..." autocomplete="off" /> 
+            <div class="input-append">
+			    <input type="text" class="filter-contact" name="search" id="search" value="" placeholder="Type contact name" autocomplete="off" /> 
 			    <span class="add-on"><i class="icon-filter"></i></span>
             </div>
 		</div>
 		<p id="noMatches" style="display:none;">No matches found</p>
 		<div class="clearfix"></div>
-		<ul class="iso-container clearfix">
-		</ul>
+		<div class="contactlist">
+		</div>
     </div>
-    <div id="sms-history">
+    <div class="boxes">
+    </div>
+    <div class="sms-history" id="orig-sms-history">
         <button type="button" class="close">&times;</button>
         <div class="contact-title">Yousuf Fauzan</div>
         
@@ -92,42 +93,41 @@
                 <div class="alert alert-error" style="display:none">
                     
                 </div>
-                <input type="hidden" id="contact_name2" name="contact_name">
+                <input type="hidden" class="contact_name2" name="contact_name">
                 <div class="control-group">
                     <div class="controls">
-                        <select id="phone2" name="phone">
+                        <select class="phone2" name="phone">
                         </select>
                     </div>
                 </div>
                 <input type="hidden" id="isajax" name="isajax" value="1">
-                <div class="msgs"></div>
+                <div class="msg-container">
+                    <div class="msgs"></div>
+                </div>
                 
                 <div class="control-group">
                     <div class="controls">
-                      <textarea name="msg" id="msg2"></textarea>                          
+                      <textarea name="msg" class="msg2"></textarea>                          
                     </div>
                 </div>
             </form>
         </div>
     </div>
+    <div id="open-chat-links">
+    </div>
     <div id="page-loader" style="display: block;">
-		<h3>Fetching Contacts from Google.</h3>
+		<h3>Fetching Contacts...</h3>
 		<img src="/static/img/loader.gif" alt="loader">
 	</div>
 	<div id="sms-notification"></div>
     <script src="/static/js/jquery.js"></script>
-    <script src="http://jquery-ui.googlecode.com/svn/tags/latest/ui/jquery.effects.core.js"></script>
-    <script src="http://jquery-ui.googlecode.com/svn/tags/latest/ui/jquery.effects.slide.js"></script>
-    <script src="/static/js/jquery.nicescroll.js"></script>
+    <script src="/static/js/cookie.js"></script>
     <script src="/static/bootstrap/js/bootstrap.js" ></script>
-    <script src="/static/js/isotope.js"></script>
-    <script src="/static/js/filter.js"></script>
+    <script src="/static/js/gridster.js"></script>
     <script src="/static/js/autosize.js"></script>
-    <script src="/static/js/main.js?v=2"></script>
-    <script src="https://apis.google.com/js/client.js?onload=load"></script>
+    <script src="/static/js/mainv2.js?v=1"></script>
     <script type="text/javascript" src="/_ah/channel/jsapi"></script>
     <script>
-
         onOpened = function() {
             connected = true;
            // sendMessage('opened');

@@ -15,6 +15,7 @@ from google.appengine.ext import ndb
 class Token(ndb.Model):
     email = ndb.StringProperty()
     apid = ndb.StringProperty()
+    version = ndb.IntegerProperty(default=0)
 
 class History(ndb.Model):
     email = ndb.StringProperty()
@@ -24,6 +25,10 @@ class History(ndb.Model):
     sent = ndb.BooleanProperty(default=False)
     created = ndb.DateTimeProperty(auto_now_add=True)
     byme = ndb.BooleanProperty(default=True)
+
+class Contacts(ndb.Model):
+    email = ndb.StringProperty(indexed=True)
+    data = ndb.JsonProperty()
 
 #class ChannelToken(nd.Model):
 #    email = ndb.StringProperty(indexed=True, required=True)
